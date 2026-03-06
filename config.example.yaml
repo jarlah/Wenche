@@ -3,10 +3,10 @@
 # config.yaml skal IKKE legges i git (se .gitignore).
 
 selskap:
-  navn: "OFL Holding AS"
+  navn: "Mitt Holding AS"
   org_nummer: "123456789"         # 9 siffer uten mellomrom
-  daglig_leder: "Ole Fredrik Larsen"
-  styreleder: "Ole Fredrik Larsen"
+  daglig_leder: "Ola Nordmann"
+  styreleder: "Ola Nordmann"
   forretningsadresse: "Gateveien 1, 0001 Oslo"
   stiftelsesaar: 2020
   aksjekapital: 30000             # NOK
@@ -56,7 +56,7 @@ balanse:
 
 # --- Aksjonærregister ---
 aksjonaerer:
-  - navn: "Ole Fredrik Larsen"
+  - navn: "Ola Nordmann"
     fodselsnummer: "01010112345"  # 11 siffer
     antall_aksjer: 100
     aksjeklasse: "ordinære"
