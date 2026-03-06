@@ -14,9 +14,9 @@ Autentisering skjer via Maskinporten med et selvgenerert RSA-nøkkelpar — inge
 
 ## Forutsetninger
 
-- Python 3.11 eller nyere
+- Python 3.11 eller nyere (sjekk med `python3 --version`, installer via `brew install python@3.11` om nødvendig)
 - Registrert Maskinporten-klient hos Digdir (se [Registrer Maskinporten-klient](#registrer-maskinporten-klient))
-- OpenSSL (for generering av nøkkelpar)
+- OpenSSL (følger med macOS og de fleste Linux-distribusjoner)
 
 ## Installasjon
 
@@ -59,14 +59,18 @@ Fyll inn selskapsinfo, regnskapstall og aksjonærdata. Filen er kommentert og se
 cp .env.example .env
 ```
 
-Fyll inn klient-ID fra Digdir og sti til privat nøkkel:
+Fyll inn verdiene fra Digdirs selvbetjeningsportal (se [Registrer Maskinporten-klient](#registrer-maskinporten-klient)):
 
 ```
 MASKINPORTEN_CLIENT_ID=din-client-id-her
 MASKINPORTEN_PRIVAT_NOKKEL=maskinporten_privat.pem
+MASKINPORTEN_KID=uuid-fra-portalen-her
+WENCHE_ENV=prod
 ```
 
-For testmiljø i stedet for produksjon:
+`MASKINPORTEN_KID` er UUID-en som portalen tildeler nøkkelen din — synlig i nøkkellisten under klienten.
+
+For testmiljø (Maskinporten test + Altinn tt02):
 
 ```
 WENCHE_ENV=test
@@ -76,12 +80,30 @@ WENCHE_ENV=test
 
 Wenche bruker Maskinporten for maskin-til-maskin-autentisering. Registrering er gratis.
 
-1. Gå til [samarbeid.digdir.no](https://samarbeid.digdir.no) og søk om tilgang som **Maskinporten-konsument**
-2. Etter innvilgelse: logg inn på selvbetjeningsportalen
-3. Opprett en ny Maskinporten-integrasjon
-4. Last opp innholdet i `maskinporten_offentlig.pem`
-5. Legg til scopes: `altinn:instances.read` og `altinn:instances.write`
-6. Kopier klient-ID inn i `.env`
+**Steg 1 — Søk om tilgang**
+
+Gå til [samarbeid.digdir.no](https://samarbeid.digdir.no) og søk om tilgang som **Maskinporten-konsument**. Du vil motta en e-post med bekreftelse og lenke til selvbetjeningsportalen.
+
+**Steg 2 — Opprett integrasjon**
+
+Logg inn på [selvbetjeningsportalen.digdir.no](https://selvbetjeningsportalen.digdir.no):
+
+1. Velg **Test** (for testmiljø) eller **Produksjon**
+2. Velg **Klienter** → **Maskinporten & KRR**
+3. Klikk **Ny integrasjon** og fyll ut:
+   - Visningsnavn: `wenche`
+   - Beskrivelse: valgfri
+   - Access token levetid: `120` (standard)
+4. Legg til scopes: `altinn:instances.read` og `altinn:instances.write`
+5. Kopier **klient-ID** inn i `.env` som `MASKINPORTEN_CLIENT_ID`
+
+**Steg 3 — Last opp offentlig nøkkel**
+
+Under klienten, klikk **Legg til nøkkel** og lim inn innholdet i `maskinporten_offentlig.pem` (PEM-format). Lagre klienten.
+
+Nøkkelen vil vises i listen med en UUID (f.eks. `9bc5078c-...`). Kopier denne UUID-en inn i `.env` som `MASKINPORTEN_KID`.
+
+> **Merk:** Endringer i testmiljøet kan ta noen minutter å synkronisere.
 
 ## Bruk
 

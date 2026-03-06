@@ -25,8 +25,8 @@ load_dotenv()
 _ENV = os.getenv("WENCHE_ENV", "prod")
 
 if _ENV == "test":
-    MASKINPORTEN_TOKEN_URL = "https://ver2.maskinporten.no/token"
-    MASKINPORTEN_AUD = "https://ver2.maskinporten.no/"
+    MASKINPORTEN_TOKEN_URL = "https://test.maskinporten.no/token"
+    MASKINPORTEN_AUD = "https://test.maskinporten.no/"
     ALTINN_EXCHANGE_URL = (
         "https://platform.tt02.altinn.no/authentication/api/v1/exchange/maskinporten"
     )
@@ -41,7 +41,7 @@ SCOPES = "altinn:instances.read altinn:instances.write"
 TOKEN_FILE = Path.home() / ".wenche" / "token.json"
 
 
-def _lag_jwt(client_id: str, private_key_pem: bytes) -> str:
+def _lag_jwt(client_id: str, private_key_pem: bytes, kid: str) -> str:
     """Lager et signert JWT for Maskinporten JWT grant-flyten."""
     now = int(time.time())
     claims = {
@@ -52,7 +52,7 @@ def _lag_jwt(client_id: str, private_key_pem: bytes) -> str:
         "exp": now + 119,  # Maskinporten tillater maks 120 sekunder
         "jti": str(uuid.uuid4()),
     }
-    header = {"alg": "RS256"}
+    header = {"alg": "RS256", "kid": kid}
     token = jwt.encode(header, claims, private_key_pem)
     return token.decode() if isinstance(token, bytes) else token
 
@@ -69,6 +69,13 @@ def login() -> dict:
             "Kopier .env.example til .env og fyll inn din klient-ID fra Digdirs selvbetjeningsportal."
         )
 
+    kid = os.getenv("MASKINPORTEN_KID")
+    if not kid:
+        raise RuntimeError(
+            "MASKINPORTEN_KID mangler.\n"
+            "Finn nøkkel-ID (UUID) i Digdirs selvbetjeningsportal under klientens nøkler og legg den i .env."
+        )
+
     nokkel_sti = os.getenv("MASKINPORTEN_PRIVAT_NOKKEL", "maskinporten_privat.pem")
     try:
         private_key_pem = Path(nokkel_sti).read_bytes()
@@ -81,7 +88,7 @@ def login() -> dict:
         )
 
     print("Autentiserer mot Maskinporten...")
-    assertion = _lag_jwt(client_id, private_key_pem)
+    assertion = _lag_jwt(client_id, private_key_pem, kid)
 
     resp = httpx.post(
         MASKINPORTEN_TOKEN_URL,
@@ -92,7 +99,10 @@ def login() -> dict:
         headers={"Content-Type": "application/x-www-form-urlencoded"},
         timeout=15,
     )
-    resp.raise_for_status()
+    if resp.status_code != 200:
+        raise RuntimeError(
+            f"Maskinporten svarte {resp.status_code}:\n{resp.text}"
+        )
     maskinporten_token = resp.json()["access_token"]
 
     print("Maskinporten-token mottatt. Henter Altinn-token...")
