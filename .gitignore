@@ -12,9 +12,10 @@ build/
 .venv/
 venv/
 
-# IDE
+# IDE og verktøy
 .vscode/
 .idea/
+.claude/
 
 # Genererte filer
 *.xml
