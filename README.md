@@ -1,5 +1,10 @@
 # Wenche
 
+![PyPI](https://img.shields.io/pypi/v/wenche)
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+
 Wenche er et enkelt kommandolinjeverktøy for holdingselskaper og småaksjeselskaper som må levere regnskap og skattedokumenter til norske myndigheter. Verktøyet hjelper deg å fylle ut og sende inn de obligatoriske skjemaene uten behov for et fullverdig regnskapsprogram.
 
 Autentisering skjer via Maskinporten med et selvgenerert RSA-nøkkelpar — ingen virksomhetssertifikat eller BankID-innlogging nødvendig.
