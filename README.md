@@ -21,14 +21,9 @@ Autentisering skjer via Maskinporten med et selvgenerert RSA-nøkkelpar — inge
 
 ## Kom i gang
 
-```bash
-pip install wenche
-wenche --help
-```
+Fullstendig veiledning for installasjon, oppsett og bruk:
 
-Fullstendig dokumentasjon med installasjon, oppsett og brukerveiledning finnes på:
-
-**[olefredrik.github.io/Wenche](https://olefredrik.github.io/Wenche/)**
+**[Les dokumentasjonen →](https://olefredrik.github.io/Wenche/)**
 
 ## Bidra
 
