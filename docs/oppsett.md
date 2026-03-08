@@ -1,24 +1,29 @@
 # Oppsett
 
-Wenche bruker Maskinporten for å autentisere deg som konsument overfor Altinn — uten nettleserinnlogging. Du trenger:
+Wenche bruker Maskinporten for å autentisere deg som konsument overfor Altinn — uten nettleserinnlogging. Oppsettet består av fire steg:
 
-1. Et RSA-nøkkelpar (genereres lokalt)
-2. En Maskinporten-klient registrert hos Digdir
-3. En `.env`-fil med klient-ID og nøkkelinformasjon
+1. Generer et RSA-nøkkelpar lokalt
+2. Registrer en Maskinporten-klient hos Digdir
+3. Konfigurer miljøvariabler (`.env`)
+4. Fyll ut selskapsinformasjon (`config.yaml`)
 
-!!! note "Webgrensesnittet hjelper deg"
-    Har du installert Wenche med UI-støtte? Start `wenche ui` og gå til fanen **Oppsett** — der kan du fylle inn konfigurasjonen direkte i nettleseren uten å redigere filer manuelt.
+!!! note "Bruker du webgrensesnittet?"
+    Steg 3 og 4 kan gjøres direkte i nettleseren: start `wenche ui` og gå til fanen **Oppsett**. Steg 1 og 2 må uansett gjøres manuelt — de krever terminalkommandoer og registrering hos Digdir.
 
 ---
 
 ## Steg 1 — Generer RSA-nøkkelpar
 
-Nøklene brukes til å identifisere deg overfor Maskinporten. Den private nøkkelen beholdes lokalt; den offentlige lastes opp til Digdir.
+Nøklene brukes til å identifisere deg overfor Maskinporten. Den private nøkkelen beholdes lokalt; den offentlige lastes opp til Digdir i steg 2.
+
+Kjør disse to kommandoene i terminalen fra mappen der Wenche er installert:
 
 ```bash
 openssl genrsa -out maskinporten_privat.pem 2048
 openssl rsa -in maskinporten_privat.pem -pubout -out maskinporten_offentlig.pem
 ```
+
+Du skal nå ha to filer: `maskinporten_privat.pem` og `maskinporten_offentlig.pem`.
 
 !!! warning "Ikke del den private nøkkelen"
     `maskinporten_privat.pem` skal aldri deles med andre eller legges i git. Filen er lagt til i `.gitignore`.
@@ -27,11 +32,12 @@ openssl rsa -in maskinporten_privat.pem -pubout -out maskinporten_offentlig.pem
 
 ## Steg 2 — Registrer Maskinporten-klient hos Digdir
 
-Registrering er gratis og tar ca. 15 minutter.
-
 ### 2a. Søk om tilgang
 
 Gå til [samarbeid.digdir.no](https://samarbeid.digdir.no) og søk om tilgang som **Maskinporten-konsument**. Du vil motta en e-post med bekreftelse og lenke til selvbetjeningsportalen.
+
+!!! info "Behandlingstid"
+    Tilgang til selvbetjeningsportalen gis vanligvis samme dag, men kan ta noe lenger tid. Steg 2b og 2c gjøres etter at du har fått tilgang.
 
 ### 2b. Opprett integrasjon
 
@@ -43,16 +49,13 @@ Logg inn på [selvbetjeningsportalen.digdir.no](https://selvbetjeningsportalen.d
     - Visningsnavn: `wenche`
     - Access token levetid: `120`
 4. Legg til scopes: `altinn:instances.read` og `altinn:instances.write`
-5. Kopier **klient-ID** — du trenger den i neste steg
+5. Kopier **klient-ID** — du trenger den i steg 3
 
 ### 2c. Last opp offentlig nøkkel
 
 Under klienten, klikk **Legg til nøkkel** og lim inn innholdet i `maskinporten_offentlig.pem`. Lagre klienten.
 
-Nøkkelen vil vises i listen med en UUID (f.eks. `9bc5078c-...`). Kopier denne UUID-en — dette er din **KID**.
-
-!!! info "Synkroniseringstid"
-    Endringer i testmiljøet kan ta noen minutter å synkronisere.
+Nøkkelen vil vises i listen med en UUID (f.eks. `9bc5078c-...`). Kopier denne UUID-en — dette er din **KID**, som du trenger i steg 3.
 
 ---
 
@@ -72,6 +75,9 @@ MASKINPORTEN_KID=uuid-fra-portalen-her
 MASKINPORTEN_PRIVAT_NOKKEL=maskinporten_privat.pem
 WENCHE_ENV=prod
 ```
+
+!!! warning "Ikke bruk anførselstegn"
+    Verdiene skal skrives direkte uten hermetegn, slik som vist ovenfor.
 
 | Variabel | Hva det er |
 |---|---|
@@ -93,7 +99,7 @@ cp config.example.yaml config.yaml
 Åpne `config.yaml` og fyll inn selskapets opplysninger, regnskapstall og aksjonærdata. Filen er kommentert og selvforklarende. Alle beløp oppgis i hele kroner (NOK).
 
 !!! tip "Webgrensesnittet"
-    Bruker du `wenche ui` kan du fylle ut all informasjon om selskapet, regnskapet og aksjonærene direkte i nettleseren — ingen manuell filredigering nødvendig.
+    Bruker du `wenche ui` kan du fylle ut all informasjon om selskapet, regnskapet og aksjonærene direkte i nettleseren under fanene **Selskap**, **Regnskap og balanse** og **Aksjonærer** — ingen manuell filredigering nødvendig.
 
 ---
 
@@ -118,5 +124,7 @@ Logg deretter ut igjen:
 ```bash
 wenche logout
 ```
+
+Får du en feilmelding, dobbeltsjekk at klient-ID og KID i `.env` stemmer med det som vises i selvbetjeningsportalen, og at den offentlige nøkkelen er lastet opp under riktig klient.
 
 [Gå videre til bruk →](bruk.md){ .md-button .md-button--primary }

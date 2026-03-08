@@ -11,7 +11,7 @@ Sjekk Python-versjonen din:
 python3 --version
 ```
 
-Viser den 3.10 eller eldre, installer en nyere versjon:
+Viser den 3.10 eller lavere, installer en nyere versjon:
 
 === "macOS"
 
@@ -33,11 +33,21 @@ Viser den 3.10 eller eldre, installer en nyere versjon:
 
 Det anbefales å installere Wenche i et virtuelt miljø for å unngå konflikter med andre Python-pakker.
 
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install wenche
-```
+=== "Kommandolinje"
+
+    ```bash
+    python3.11 -m venv .venv
+    source .venv/bin/activate   # Windows: .venv\Scripts\activate
+    pip install wenche
+    ```
+
+=== "Webgrensesnitt"
+
+    ```bash
+    python3.11 -m venv .venv
+    source .venv/bin/activate   # Windows: .venv\Scripts\activate
+    pip install "wenche[ui]"
+    ```
 
 Wenche er nå tilgjengelig som kommandoen `wenche` i terminalen:
 
@@ -51,21 +61,15 @@ wenche --help
     source .venv/bin/activate
     ```
 
-## Webgrensesnitt (valgfritt)
+## Start webgrensesnittet
 
-Foretrekker du å fylle ut skjemaer i nettleseren fremfor terminalen? Installer Wenche med UI-støtte:
-
-```bash
-pip install "wenche[ui]"
-```
-
-Start webgrensesnittet:
+Har du installert `wenche[ui]`, starter du grensesnittet slik:
 
 ```bash
 wenche ui
 ```
 
-En nettleser åpner seg automatisk på `http://localhost:8501`. Du kan fylle inn selskapsinformasjon og regnskapstall i skjemaene, laste ned dokumenter og sende inn direkte fra grensesnittet.
+Streamlit starter og åpner `http://localhost:8501` i nettleseren. Åpnes ikke nettleseren automatisk, kan du lime inn adressen manuelt.
 
 ## For utviklere
 
@@ -74,7 +78,7 @@ Vil du bidra til koden eller kjøre siste versjon fra GitHub?
 ```bash
 git clone https://github.com/olefredrik/wenche.git
 cd wenche
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```

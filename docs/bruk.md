@@ -4,11 +4,26 @@ Wenche kan brukes enten via **kommandolinjen** eller via **webgrensesnittet** (`
 
 ---
 
+## Autentisering
+
+Innsending av årsregnskap og aksjonærregisteroppgave krever innlogging mot Maskinporten:
+
+```bash
+wenche login     # Autentiserer og lagrer token lokalt
+wenche logout    # Sletter lagret token
+```
+
+Tokenet lagres i `~/.wenche/token.json` og gjenbrukes automatisk for påfølgende kommandoer. Bruker du webgrensesnittet håndteres innlogging derfra.
+
+---
+
 ## Skattemelding (frist 31. mai)
 
-Wenche genererer et ferdig utfylt sammendrag av RF-1167 (næringsoppgaven) og RF-1028 (skattemeldingen) basert på tallene i `config.yaml`.
+Wenche genererer et ferdig utfylt sammendrag av RF-1167 (næringsoppgaven) og RF-1028 (skattemeldingen).
 
 === "Kommandolinje"
+
+    Genererer fra tallene i `config.yaml`:
 
     ```bash
     wenche generer-skattemelding
@@ -51,7 +66,7 @@ Sammendraget inneholder:
     wenche send-aarsregnskap --dry-run
     ```
 
-    `--dry-run` lagrer de genererte XML-dokumentene lokalt slik at du kan inspisere dem.
+    `--dry-run` lagrer de genererte XML-dokumentene lokalt slik at du kan inspisere dem før du sender.
 
     Send inn:
 
@@ -91,17 +106,6 @@ Sammendraget inneholder:
 
 ---
 
-## Autentisering
-
-`wenche login` autentiserer mot Maskinporten med din private RSA-nøkkel og lagrer et token lokalt i `~/.wenche/token.json`. Tokenet gjenbrukes automatisk for påfølgende kommandoer i samme sesjon.
-
-```bash
-wenche login     # Henter og lagrer token
-wenche logout    # Sletter lagret token
-```
-
----
-
 ## Alle kommandoer
 
 ```
@@ -110,7 +114,7 @@ wenche --help
 Kommandoer:
   login                    Autentiser mot Maskinporten med RSA-nokkel
   logout                   Logg ut og slett lagret token
-  generer-skattemelding    Generer ferdig utfylt RF-1167 og RF-1028 fra config.yaml
+  generer-skattemelding    Generer ferdig utfylt RF-1167 og RF-1028
   send-aarsregnskap        Send inn arsregnskap til Bronnoysundregistrene
   send-aksjonaerregister   Send inn aksjonaerregisteroppgave (RF-1086)
   ui                       Start webgrensesnittet i nettleseren
@@ -123,6 +127,9 @@ Alternativer (generer-skattemelding):
   --config TEXT            Sti til konfigurasjonsfil [standard: config.yaml]
   --ut TEXT                Lagre sammendrag til fil
 ```
+
+!!! note
+    Kommandolisten viser utskriften slik den faktisk ser ut i terminalen. Noen norske tegn vises ikke korrekt i terminalutskriften.
 
 ---
 
