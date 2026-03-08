@@ -235,18 +235,108 @@ st.set_page_config(page_title="Wenche", layout="wide")
 st.title("Wenche")
 st.caption("Enkel innsending av regnskap og skattedokumenter til norske myndigheter")
 
-fane_selskap, fane_regnskap, fane_aksjonaerer, fane_dokumenter, fane_send = st.tabs(
-    ["1. Selskap", "2. Regnskap og balanse", "3. Aksjonærer", "4. Dokumenter", "5. Send til Altinn"]
+fane_oppsett, fane_selskap, fane_regnskap, fane_aksjonaerer, fane_dokumenter, fane_send = st.tabs(
+    ["1. Oppsett", "2. Selskap", "3. Regnskap og balanse", "4. Aksjonærer", "5. Dokumenter", "6. Send til Altinn"]
 )
 
 
 # ---------------------------------------------------------------------------
-# Fane 1: Selskapsopplysninger
+# Fane 1: Oppsett og tilkoblingssjekk
+# ---------------------------------------------------------------------------
+
+def _sjekk_konfig() -> list[tuple[bool, str, str]]:
+    """
+    Kjører statiske konfigurasjonsjekker uten nettverkskall.
+    Returnerer liste av (ok, tittel, detalj).
+    """
+    resultater = []
+
+    client_id = os.getenv("MASKINPORTEN_CLIENT_ID")
+    resultater.append((
+        bool(client_id),
+        "MASKINPORTEN_CLIENT_ID",
+        "Satt" if client_id else "Mangler — legg til i .env-filen",
+    ))
+
+    kid = os.getenv("MASKINPORTEN_KID")
+    resultater.append((
+        bool(kid),
+        "MASKINPORTEN_KID",
+        "Satt" if kid else "Mangler — legg til i .env-filen",
+    ))
+
+    nokkel_sti = os.getenv("MASKINPORTEN_PRIVAT_NOKKEL", "maskinporten_privat.pem")
+    nokkel_ok = Path(nokkel_sti).exists()
+    resultater.append((
+        nokkel_ok,
+        "Privat nøkkel",
+        f"Funnet: {nokkel_sti}" if nokkel_ok else f"Finner ikke filen: {nokkel_sti}",
+    ))
+
+    env = os.getenv("WENCHE_ENV", "prod")
+    resultater.append((
+        True,
+        "Miljø",
+        f"{'Testmiljø (tt02)' if env == 'test' else 'Produksjon'} — endre med WENCHE_ENV=test i .env",
+    ))
+
+    return resultater
+
+
+with fane_oppsett:
+    st.subheader("Steg 1 av 6 — Oppsett og tilkobling")
+    st.caption(
+        "Verifiser at Wenche er riktig konfigurert før du fyller inn selskapsinformasjon. "
+        "Du trenger en gyldig Maskinporten-klient for å sende inn til Altinn."
+    )
+
+    st.markdown("#### Konfigurasjon")
+    sjekker = _sjekk_konfig()
+    alle_ok = all(ok for ok, _, _ in sjekker)
+
+    for ok, tittel, detalj in sjekker:
+        if ok:
+            st.success(f"**{tittel}** — {detalj}")
+        else:
+            st.error(f"**{tittel}** — {detalj}")
+
+    st.markdown("---")
+    st.markdown("#### Tilkoblingstest")
+    st.caption(
+        "Testen henter et midlertidig token fra Maskinporten og veksler det mot et Altinn-token. "
+        "Ingen data sendes inn."
+    )
+
+    if not alle_ok:
+        st.warning("Fiks konfigurasjonsfeilene ovenfor før du tester tilkoblingen.")
+    else:
+        if st.button("Test tilkobling mot Altinn", type="primary"):
+            with st.spinner("Kobler til Maskinporten og Altinn..."):
+                try:
+                    auth.login()
+                    st.success(
+                        "Tilkobling OK — Maskinporten og Altinn svarte som forventet. "
+                        "Du kan nå fylle inn selskapsinformasjon og sende inn."
+                    )
+                except RuntimeError as e:
+                    st.error(str(e))
+                except Exception as e:
+                    st.error(f"Uventet feil: {e}")
+
+    st.markdown("---")
+    st.markdown(
+        "Har du ikke satt opp Maskinporten ennå? "
+        "Se [installasjonsveiledningen](https://github.com/olefredrik/wenche#registrer-maskinporten-klient) på GitHub."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Fane 2: Selskapsopplysninger
 # ---------------------------------------------------------------------------
 
 with fane_selskap:
-    st.subheader("Steg 1 av 5 — Selskapsopplysninger")
-    st.caption("Fyll inn grunnleggende informasjon om selskapet. Fortsett til steg 2 når du er ferdig.")
+    st.subheader("Steg 2 av 6 — Selskapsopplysninger")
+    st.caption("Fyll inn grunnleggende informasjon om selskapet. Fortsett til steg 3 når du er ferdig.")
     col1, col2 = st.columns(2)
     with col1:
         st.text_input("Selskapsnavn", key="navn")
@@ -270,8 +360,8 @@ with fane_selskap:
 # ---------------------------------------------------------------------------
 
 with fane_regnskap:
-    st.subheader("Steg 2 av 5 — Regnskap og balanse")
-    st.caption("Fyll inn tall fra resultatregnskapet og balansen. Fortsett til steg 3 når du er ferdig.")
+    st.subheader("Steg 3 av 6 — Regnskap og balanse")
+    st.caption("Fyll inn tall fra resultatregnskapet og balansen. Fortsett til steg 4 når du er ferdig.")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -376,7 +466,7 @@ with fane_regnskap:
 # ---------------------------------------------------------------------------
 
 with fane_aksjonaerer:
-    st.subheader("Steg 3 av 5 — Aksjonærer")
+    st.subheader("Steg 4 av 6 — Aksjonærer")
     st.caption("Fyll inn opplysninger om aksjonærene. Fortsett til steg 4 når du er ferdig.")
     st.number_input("Antall aksjonærer", min_value=1, max_value=20, key="antall_aksjonaerer")
     antall = int(st.session_state["antall_aksjonaerer"])
@@ -407,7 +497,7 @@ with fane_aksjonaerer:
 # ---------------------------------------------------------------------------
 
 with fane_dokumenter:
-    st.subheader("Steg 4 av 5 — Last ned dokumenter")
+    st.subheader("Steg 5 av 6 — Last ned dokumenter")
     st.caption("Generer og last ned dokumentene for gjennomgang. Gå til steg 5 når du er klar til å sende inn.")
     st.markdown("**Skattemelding-innstillinger**")
     col1, col2 = st.columns(2)
@@ -572,7 +662,7 @@ with fane_dokumenter:
 # ---------------------------------------------------------------------------
 
 with fane_send:
-    st.subheader("Steg 5 av 5 — Send til Altinn")
+    st.subheader("Steg 6 av 6 — Send til Altinn")
     st.caption("Send dokumentene digitalt til Brønnøysundregistrene og Skatteetaten via Altinn.")
 
     env_valg = st.radio(
