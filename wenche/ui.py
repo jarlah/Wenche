@@ -236,7 +236,7 @@ st.title("Wenche")
 st.caption("Enkel innsending av regnskap og skattedokumenter til norske myndigheter")
 
 fane_selskap, fane_regnskap, fane_aksjonaerer, fane_dokumenter, fane_send = st.tabs(
-    ["🏢 Selskap", "📊 Regnskap og balanse", "👥 Aksjonærer", "📄 Dokumenter", "📬 Send til Altinn"]
+    ["1. Selskap", "2. Regnskap og balanse", "3. Aksjonærer", "4. Dokumenter", "5. Send til Altinn"]
 )
 
 
@@ -245,7 +245,8 @@ fane_selskap, fane_regnskap, fane_aksjonaerer, fane_dokumenter, fane_send = st.t
 # ---------------------------------------------------------------------------
 
 with fane_selskap:
-    st.subheader("Selskapsopplysninger")
+    st.subheader("Steg 1 av 5 — Selskapsopplysninger")
+    st.caption("Fyll inn grunnleggende informasjon om selskapet. Fortsett til steg 2 når du er ferdig.")
     col1, col2 = st.columns(2)
     with col1:
         st.text_input("Selskapsnavn", key="navn")
@@ -269,7 +270,8 @@ with fane_selskap:
 # ---------------------------------------------------------------------------
 
 with fane_regnskap:
-    st.subheader("Resultatregnskap")
+    st.subheader("Steg 2 av 5 — Regnskap og balanse")
+    st.caption("Fyll inn tall fra resultatregnskapet og balansen. Fortsett til steg 3 når du er ferdig.")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -374,7 +376,8 @@ with fane_regnskap:
 # ---------------------------------------------------------------------------
 
 with fane_aksjonaerer:
-    st.subheader("Aksjonærer")
+    st.subheader("Steg 3 av 5 — Aksjonærer")
+    st.caption("Fyll inn opplysninger om aksjonærene. Fortsett til steg 4 når du er ferdig.")
     st.number_input("Antall aksjonærer", min_value=1, max_value=20, key="antall_aksjonaerer")
     antall = int(st.session_state["antall_aksjonaerer"])
 
@@ -404,7 +407,8 @@ with fane_aksjonaerer:
 # ---------------------------------------------------------------------------
 
 with fane_dokumenter:
-    st.subheader("Last ned dokumenter")
+    st.subheader("Steg 4 av 5 — Last ned dokumenter")
+    st.caption("Generer og last ned dokumentene for gjennomgang. Gå til steg 5 når du er klar til å sende inn.")
     st.markdown("**Skattemelding-innstillinger**")
     col1, col2 = st.columns(2)
     with col1:
@@ -561,7 +565,8 @@ with fane_dokumenter:
 # ---------------------------------------------------------------------------
 
 with fane_send:
-    st.subheader("Send til Altinn")
+    st.subheader("Steg 5 av 5 — Send til Altinn")
+    st.caption("Send dokumentene digitalt til Brønnøysundregistrene og Skatteetaten via Altinn.")
 
     env_valg = st.radio(
         "Miljø",
