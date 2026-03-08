@@ -235,8 +235,8 @@ st.set_page_config(page_title="Wenche", layout="wide")
 st.title("Wenche")
 st.caption("Enkel innsending av regnskap og skattedokumenter til norske myndigheter")
 
-fane_selskap, fane_regnskap, fane_aksjonaerer, fane_generer = st.tabs(
-    ["🏢 Selskap", "📊 Regnskap og balanse", "👥 Aksjonærer", "📄 Generer"]
+fane_selskap, fane_regnskap, fane_aksjonaerer, fane_dokumenter, fane_send = st.tabs(
+    ["🏢 Selskap", "📊 Regnskap og balanse", "👥 Aksjonærer", "📄 Dokumenter", "📬 Send til Altinn"]
 )
 
 
@@ -400,11 +400,11 @@ with fane_aksjonaerer:
 
 
 # ---------------------------------------------------------------------------
-# Fane 4: Generer dokumenter
+# Fane 4: Dokumenter
 # ---------------------------------------------------------------------------
 
-with fane_generer:
-    st.subheader("Generer dokumenter")
+with fane_dokumenter:
+    st.subheader("Last ned dokumenter")
     st.markdown("**Skattemelding-innstillinger**")
     col1, col2 = st.columns(2)
     with col1:
@@ -556,11 +556,11 @@ with fane_generer:
                     mime="application/xml",
                 )
 
-    # -----------------------------------------------------------------------
-    # Innsending til Altinn
-    # -----------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Fane 5: Send til Altinn
+# ---------------------------------------------------------------------------
 
-    st.divider()
+with fane_send:
     st.subheader("Send til Altinn")
 
     env_valg = st.radio(
@@ -581,6 +581,7 @@ with fane_generer:
             st.error(f"Autentisering feilet:\n\n{e}")
             return None
 
+    st.divider()
     col1, col2 = st.columns(2)
 
     with col1:
