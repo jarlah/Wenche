@@ -314,6 +314,12 @@ with fane_oppsett:
 
     # --- Konfigurasjonsskjema ---
     st.markdown("#### Konfigurasjon")
+    st.info(
+        "Klient-ID og Nøkkel-ID finner du i [Digdirs selvbetjeningsportal](https://sjolvbetjening.samarbeid.digdir.no/) "
+        "under din Maskinporten-klient. Se [oppsettsveiledningen](https://olefredrik.github.io/Wenche/oppsett/) "
+        "hvis du ikke har opprettet en klient ennå.",
+        icon="ℹ️",
+    )
     st.caption(
         "Verdiene lagres i `.env`-filen i arbeidsmappen din og brukes automatisk ved neste oppstart."
     )
@@ -323,29 +329,29 @@ with fane_oppsett:
     col1, col2 = st.columns(2)
     with col1:
         inp_client_id = st.text_input(
-            "Klient-ID (MASKINPORTEN_CLIENT_ID)",
+            "Klient-ID",
             value=os.getenv("MASKINPORTEN_CLIENT_ID", ""),
             placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-            help="UUID fra Digdirs selvbetjeningsportal under Maskinporten-klienten.",
+            help="UUID-en til Maskinporten-klienten din fra Digdirs selvbetjeningsportal. Lagres som MASKINPORTEN_CLIENT_ID i .env.",
         )
         inp_kid = st.text_input(
-            "Nøkkel-ID (MASKINPORTEN_KID)",
+            "Nøkkel-ID",
             value=os.getenv("MASKINPORTEN_KID", ""),
             placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-            help="UUID som portalen tildelte nøkkelen din — synlig i nøkkellisten under klienten.",
+            help="UUID-en som portalen tildelte nøkkelen din — synlig i nøkkellisten under klienten. Lagres som MASKINPORTEN_KID i .env.",
         )
         inp_orgnr = st.text_input(
-            "Organisasjonsnummer (ORG_NUMMER)",
+            "Organisasjonsnummer",
             value=os.getenv("ORG_NUMMER", ""),
             placeholder="123456789",
-            help="Organisasjonsnummeret til selskapet som er registrert som API-konsument i Maskinporten.",
+            help="Organisasjonsnummeret til selskapet du sender inn på vegne av. Lagres som ORG_NUMMER i .env.",
         )
     with col2:
         inp_env = st.selectbox(
-            "Miljø (WENCHE_ENV)",
+            "Miljø",
             options=["prod", "test"],
             index=0 if os.getenv("WENCHE_ENV", "prod") == "prod" else 1,
-            help="Velg 'test' for å bruke Altinn tt02-testmiljøet.",
+            help="Velg 'test' for å bruke Altinn tt02-testmiljøet. Lagres som WENCHE_ENV i .env.",
         )
         opplastet_nokkel = st.file_uploader(
             "Last opp privat nøkkel (.pem)",
