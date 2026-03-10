@@ -45,6 +45,10 @@ def generer_hovedskjema(regnskap: Aarsregnskap) -> bytes:
       <organisasjonsform orid="756">AS</organisasjonsform>
       <navn orid="1">{s.navn}</navn>
     </enhet>
+    <opplysningerInnsending>
+      <systemNavn orid="39007">Wenche</systemNavn>
+      <noteMaskinellBehandling orid="37499">Maskinell innsending</noteMaskinellBehandling>
+    </opplysningerInnsending>
   </Innsender>
   <Skjemainnhold>
     <regnskapsperiode>
@@ -189,7 +193,7 @@ def generer_underskjema(regnskap: Aarsregnskap) -> bytes:
       </resultat>
       <overfoeringer>
         <sumOverfoeringerOgDisponeringer>
-          <aarets orid="7067">0</aarets>
+          <aarets orid="7067">{r.aarsresultat}</aarets>
           <fjoraarets orid="7068">0</fjoraarets>
         </sumOverfoeringerOgDisponeringer>
       </overfoeringer>
@@ -297,6 +301,13 @@ def generer_underskjema(regnskap: Aarsregnskap) -> bytes:
         </balanseKortsiktigGjeld>
       </balanseGjeldOversikt>
     </balanseEgenkapitalGjeld>
+
+
+    <noter>
+      <noteAarsverkTjenestePensjon>
+        <antallAarsverk orid="37467">0</antallAarsverk>
+      </noteAarsverkTjenestePensjon>
+    </noter>
 
   </Skjemainnhold-RR0002U>
 </melding>"""
