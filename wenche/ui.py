@@ -885,13 +885,17 @@ with fane_send:
                 token = hent_token()
                 if token:
                     try:
-                        with st.spinner("Sender årsregnskap til Altinn..."):
+                        with st.spinner("Laster opp årsregnskap til Altinn..."):
                             with AltinnClient(token, env=env) as klient:
-                                ar_modul.send_inn(regnskap, klient)
+                                sign_url = ar_modul.send_inn(regnskap, klient)
                         st.success(
-                            f"Årsregnskap for {regnskap.regnskapsaar} sendt inn til "
-                            f"Brønnøysundregistrene."
+                            f"Årsregnskap for {regnskap.regnskapsaar} er lastet opp og klar for signering."
                         )
+                        st.info(
+                            "Dokumentet venter på din signatur i Altinn. "
+                            "Logg inn med BankID og signer for å fullføre innsendingen."
+                        )
+                        st.link_button("Signer i Altinn", sign_url, type="primary")
                     except Exception as e:
                         st.error(f"Innsending feilet:\n\n{e}")
 

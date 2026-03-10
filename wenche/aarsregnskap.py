@@ -118,7 +118,7 @@ def valider(regnskap: Aarsregnskap) -> list[str]:
     return feil
 
 
-def send_inn(regnskap: Aarsregnskap, klient: AltinnClient, dry_run: bool = False) -> None:
+def send_inn(regnskap: Aarsregnskap, klient: AltinnClient, dry_run: bool = False) -> str | None:
     """
     Sender inn årsregnskapet til Brønnøysundregistrene via Altinn.
 
@@ -126,8 +126,10 @@ def send_inn(regnskap: Aarsregnskap, klient: AltinnClient, dry_run: bool = False
       1. Opprett instans → Altinn oppretter data-elementer automatisk
       2. PUT Hovedskjema (selskapsinfo, periode, prinsipper)
       3. PUT Underskjema (resultatregnskap og balanse)
-      4. process/next med action=confirm
-      5. process/next med action=sign
+      4. process/next (uten action) → avanserer til Signering
+
+    Returnerer Altinn-lenken der brukeren må signere med BankID/ID-Porten.
+    Signering kan ikke gjøres maskinelt — dette er et juridisk krav.
 
     dry_run=True skriver XML-filene lokalt uten å sende til Altinn.
     """
@@ -175,8 +177,8 @@ def send_inn(regnskap: Aarsregnskap, klient: AltinnClient, dry_run: bool = False
     )
     print("Underskjema lastet opp.")
 
-    klient.fullfoor_instans("aarsregnskap", instans)
+    sign_url = klient.fullfoor_instans("aarsregnskap", instans)
 
-    status = klient.hent_status("aarsregnskap", instans)
-    print(f"Status: {status.get('status', {}).get('value', 'ukjent')}")
-    print("Årsregnskap sendt inn.")
+    print(f"Årsregnskap lastet opp og klar for signering.")
+    print(f"Signer i Altinn: {sign_url}")
+    return sign_url

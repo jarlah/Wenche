@@ -14,10 +14,12 @@ _BASES = {
     "test": {
         "platform": "https://platform.tt02.altinn.no",
         "apps": "https://{org}.apps.tt02.altinn.no",
+        "web": "https://tt02.altinn.no",
     },
     "prod": {
         "platform": "https://platform.altinn.no",
         "apps": "https://{org}.apps.altinn.no",
+        "web": "https://altinn.no",
     },
 }
 
@@ -48,6 +50,7 @@ class AltinnClient:
             raise ValueError(f"Ugyldig env: {env!r}. Bruk 'prod' eller 'test'.")
         self._env = env
         self._apps_base = _BASES[env]["apps"]
+        self._altinn_web = _BASES[env]["web"]
         self._token = altinn_token
         self._http = httpx.Client(
             headers={
@@ -107,11 +110,12 @@ class AltinnClient:
             f"Tilgjengelige typer: {[e.get('dataType') for e in instans.get('data', [])]}"
         )
 
-    def fullfoor_instans(self, app_key: str, instans: dict) -> None:
+    def fullfoor_instans(self, app_key: str, instans: dict) -> str:
         """
-        Fullfører innsending i to steg:
-          1. process/next (uten action) — avanserer fra Utfylling til Signering
-          2. process/next med action=sign — signerer og sender inn
+        Avanserer instansen til signeringssteget og returnerer Altinn-lenken
+        der brukeren kan signere med BankID/ID-Porten.
+
+        Signering krever ID-Porten og kan ikke gjøres maskinelt.
         """
         instance_id = instans["id"]
         url = f"{self._app_base(app_key)}/instances/{instance_id}/process/next"
@@ -119,12 +123,9 @@ class AltinnClient:
         resp = self._http.put(url)
         if not resp.is_success:
             raise RuntimeError(f"{resp.status_code} {resp.reason_phrase}:\n{resp.text}")
-        print("Instans avansert til signeringssteg.")
+        print("Instans klar for signering.")
 
-        resp = self._http.put(url, json={"action": "sign"})
-        if not resp.is_success:
-            raise RuntimeError(f"{resp.status_code} {resp.reason_phrase}:\n{resp.text}")
-        print("Innsending signert og fullført.")
+        return f"{self._altinn_web}/skjema/{instance_id}"
 
     def hent_status(self, app_key: str, instans: dict) -> dict:
         """Henter status for en instans."""
