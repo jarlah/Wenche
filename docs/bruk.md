@@ -82,9 +82,16 @@ Sammendraget inneholder:
     wenche logout
     ```
 
+    Wenche skriver ut en Altinn-lenke når opplastingen er ferdig. Åpne lenken i nettleseren og signer med BankID for å fullføre innsendingen.
+
 === "Webgrensesnitt"
 
     Gå til fanen **Send til Altinn** og klikk **Send årsregnskap**.
+
+    Når opplastingen er ferdig vises en knapp **Signer i Altinn**. Klikk den og signer med BankID for å fullføre innsendingen.
+
+!!! note "Signering skjer i Altinn, ikke i Wenche"
+    Wenche laster opp regnskapet og klargjør det for signering. Selve signeringen må gjøres av daglig leder eller styreleder i Altinn med BankID — dette er et juridisk krav og kan ikke gjøres maskinelt.
 
 ---
 
