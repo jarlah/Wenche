@@ -19,6 +19,7 @@ venv/
 .claude/
 
 # Genererte filer
+site/
 *.xml
 *.xbrl
 *.html
