@@ -29,9 +29,13 @@ theme:
 
 nav:
   - Hjem: index.md
-  - Installasjon: installasjon.md
-  - Oppsett: oppsett.md
-  - Bruk: bruk.md
+  - Kom i gang:
+    - Installasjon: installasjon.md
+    - Oppsett: oppsett.md
+    - Din første innsending: tutorial.md
+  - Veiledninger:
+    - Bruk: bruk.md
+  - Referanse: referanse.md
 
 markdown_extensions:
   - admonition
