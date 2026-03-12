@@ -6,15 +6,15 @@
 # manuelt — all informasjon kan fylles inn direkte i nettleseren.
 
 selskap:
-  navn: "Mitt Holding AS"
+  navn: "Eksempel Holding AS"
   org_nummer: "123456789"           # 9 siffer uten mellomrom
-  daglig_leder: "Ola Nordmann"
-  styreleder: "Ola Nordmann"        # Kan være samme person som daglig leder
-  forretningsadresse: "Gateveien 1, 0001 Oslo"
-  stiftelsesaar: 2020
+  daglig_leder: "Kari Nordmann"
+  styreleder: "Kari Nordmann"       # Kan være samme person som daglig leder
+  forretningsadresse: "Eksempelgata 1, 0001 Oslo"
+  stiftelsesaar: 2021
   aksjekapital: 30000               # NOK — fra stiftelsesdokumentene
 
-regnskapsaar: 2025                  # Året regnskapet gjelder for
+regnskapsaar: 2024                  # Året regnskapet gjelder for
 
 # --- Resultatregnskap ---
 # Alle beløp i hele kroner (NOK). Bruk 0 for poster som ikke er aktuelle.
@@ -30,10 +30,10 @@ resultatregnskap:
     andre_driftskostnader: 5500     # Bank- og regnskapsgebyrer, kontorkostnader o.l.
 
   finansposter:
-    utbytte_fra_datterselskap: 0    # Utbytte mottatt fra datterselskaper (fritaksmetoden)
-    andre_finansinntekter: 0        # Renteinntekter og andre finansinntekter
-    rentekostnader: 0               # Renter på lån
-    andre_finanskostnader: 0        # Andre finanskostnader
+    utbytte_fra_datterselskap: 250000 # Utbytte mottatt fra datterselskaper (fritaksmetoden)
+    andre_finansinntekter: 0          # Renteinntekter og andre finansinntekter
+    rentekostnader: 0                 # Renter på lån
+    andre_finanskostnader: 0          # Andre finanskostnader
 
 # --- Balanse ---
 # Balansen skal gå opp: sum eiendeler = sum egenkapital og gjeld.
@@ -53,14 +53,14 @@ balanse:
     egenkapital:
       aksjekapital: 30000             # Innbetalt aksjekapital (fra stiftelsesdokumentene)
       overkursfond: 0                 # Innbetalt over pålydende ved emisjon
-      annen_egenkapital: -34300       # Akkumulert overskudd/underskudd. Negativ = underskudd
+      annen_egenkapital: 213700       # Akkumulert overskudd/underskudd. Negativ = underskudd
     langsiktig_gjeld:
-      laan_fra_aksjonaer: 105500      # Lån fra eier med avtalt løpetid over 1 år
+      laan_fra_aksjonaer: 0           # Lån fra eier med avtalt løpetid over 1 år
       andre_langsiktige_laan: 0       # Banklån og andre lån med løpetid over 1 år
     kortsiktig_gjeld:
       leverandoergjeld: 0             # Ubetalte fakturaer per 31.12
       skyldige_offentlige_avgifter: 0 # Skyldig mva, arbeidsgiveravgift o.l.
-      annen_kortsiktig_gjeld: 0       # Annen gjeld med forfall innen 1 år
+      annen_kortsiktig_gjeld: 52000   # Annen gjeld med forfall innen 1 år
 
 # --- Foregående år (sammenligningstall) ---
 # Obligatorisk etter regnskapslovens § 6-6.
@@ -119,10 +119,10 @@ skattemelding:
 # Fødselsnummer brukes av Skatteetaten til å forhåndsutfylle aksjonærenes skattemelding.
 
 aksjonaerer:
-  - navn: "Ola Nordmann"
+  - navn: "Kari Nordmann"
     fodselsnummer: "01010112345"        # 11 siffer — personnummer
-    antall_aksjer: 100
+    antall_aksjer: 1000
     aksjeklasse: "ordinære"
     utbytte_utbetalt: 0                 # Utbytte utbetalt til denne aksjonæren i NOK
-    innbetalt_kapital_per_aksje: 300    # Aksjekapital (NOK) / antall aksjer.
-                                        # Eks: 30 000 kr / 100 aksjer = 300 kr per aksje
+    innbetalt_kapital_per_aksje: 30     # Aksjekapital (NOK) / antall aksjer.
+                                        # Eks: 30 000 kr / 1 000 aksjer = 30 kr per aksje
