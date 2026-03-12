@@ -1,6 +1,6 @@
 # Din første innsending
 
-Denne veiledningen tar deg gjennom en komplett innsending fra start til slutt. Vi bruker et fiktivt selskap — **Fjordheim Holding AS** — som eksempel gjennom hele prosessen.
+Denne veiledningen tar deg gjennom en komplett innsending fra start til slutt. Vi bruker et fiktivt selskap — **Eksempel Holding AS** — som eksempel gjennom hele prosessen.
 
 !!! note "Forutsetninger"
     Du bør ha fullført [installasjon](installasjon.md) og [oppsett](oppsett.md) før du starter. Wenche skal være installert, `.env` skal være konfigurert, og systembrukeren skal være godkjent i Altinn.
@@ -9,92 +9,30 @@ Denne veiledningen tar deg gjennom en komplett innsending fra start til slutt. V
 
 ## Selskapet vi bruker som eksempel
 
-**Fjordheim Holding AS** er et enkelt holdingselskap med følgende situasjon for regnskapsåret 2024:
+**Eksempel Holding AS** er et enkelt holdingselskap med følgende situasjon for regnskapsåret 2024:
 
 - Eier 100 % av Fjordheim Teknologi AS
 - Mottok **250 000 kr** i utbytte fra datterselskapet
 - Betalte **5 500 kr** i regnskaps- og bankgebyrer
 - Har **1 200 kr** på driftskonto per 31.12
 - Aksjekapital: **30 000 kr**
-- Daglig leder og styreleder: **Marte Fjordheim**
-- Én aksjonær: Marte Fjordheim, 1 000 aksjer
+- Daglig leder og styreleder: **Kari Nordmann**
+- Én aksjonær: Kari Nordmann, 1 000 aksjer
 
 ---
 
 ## Steg 1 — Fyll ut config.yaml
 
-Kopier eksempelfilen og åpne den i en teksteditor:
+`config.example.yaml` i prosjektmappen er allerede fylt ut med tallene for Eksempel Holding AS. Kopier den for å følge denne veiledningen uten å endre noe:
 
 ```bash
 cp config.example.yaml config.yaml
 ```
 
-Fyll inn tallene for Fjordheim Holding AS:
-
-```yaml
-selskap:
-  navn: "Fjordheim Holding AS"
-  org_nummer: "912345678"
-  daglig_leder: "Marte Fjordheim"
-  styreleder: "Marte Fjordheim"
-  forretningsadresse: "Storgata 1, 5003 Bergen"
-  stiftelsesaar: 2021
-  aksjekapital: 30000
-
-regnskapsaar: 2024
-
-resultatregnskap:
-  driftsinntekter:
-    salgsinntekter: 0
-    andre_driftsinntekter: 0
-  driftskostnader:
-    loennskostnader: 0
-    avskrivninger: 0
-    andre_driftskostnader: 5500
-  finansposter:
-    utbytte_fra_datterselskap: 250000
-    andre_finansinntekter: 0
-    rentekostnader: 0
-    andre_finanskostnader: 0
-
-balanse:
-  eiendeler:
-    anleggsmidler:
-      aksjer_i_datterselskap: 100000
-      andre_aksjer: 0
-      langsiktige_fordringer: 0
-    omloepmidler:
-      kortsiktige_fordringer: 0
-      bankinnskudd: 1200
-  egenkapital_og_gjeld:
-    egenkapital:
-      aksjekapital: 30000
-      overkursfond: 0
-      annen_egenkapital: 213700
-    langsiktig_gjeld:
-      laan_fra_aksjonaer: 0
-      andre_langsiktige_laan: 0
-    kortsiktig_gjeld:
-      leverandoergjeld: 0
-      skyldige_offentlige_avgifter: 0
-      annen_kortsiktig_gjeld: 52000
-
-skattemelding:
-  underskudd_til_fremfoering: 0
-  anvend_fritaksmetoden: true
-  eierandel_datterselskap: 100
-
-aksjonaerer:
-  - navn: "Marte Fjordheim"
-    fodselsnummer: "01019012345"
-    antall_aksjer: 1000
-    aksjeklasse: "ordinære"
-    utbytte_utbetalt: 0
-    innbetalt_kapital_per_aksje: 30
-```
+Når du er klar til å levere ditt eget regnskap, åpner du `config.yaml` i en teksteditor og erstatter verdiene med dine egne tall. Se [Referanse](referanse.md) for beskrivelse av alle felt.
 
 !!! tip "Balansen må gå opp"
-    Sum eiendeler (101 200 kr) skal være lik sum egenkapital og gjeld (30 000 + 213 700 + 52 000 = 295 700 kr)... Stemmer ikke? Wenche gir deg en advarsel og viser differansen. Dobbeltsjekk tallene.
+    Sum eiendeler skal være lik sum egenkapital og gjeld. Stemmer ikke tallene, gir Wenche deg en advarsel og viser differansen.
 
 ---
 
@@ -109,7 +47,7 @@ wenche generer-skattemelding
 Du skal se en utskrift som inneholder:
 
 - Næringsoppgave (RF-1167) med driftsinntekter, driftskostnader og finansposter
-- Skatteberegning — for Fjordheim Holding AS med 100 % eierandel er utbyttet fritatt under fritaksmetoden, og skatten blir **0 kr**
+- Skatteberegning — for Eksempel Holding AS med 100 % eierandel er utbyttet fritatt under fritaksmetoden, og skatten blir **0 kr**
 - Egenkapitalnote (rskl. § 7-2b) — vises automatisk når `foregaaende_aar` er utfylt
 
 Lagre til fil for enklere kopiering:

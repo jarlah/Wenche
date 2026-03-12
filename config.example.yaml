@@ -6,11 +6,11 @@
 # manuelt — all informasjon kan fylles inn direkte i nettleseren.
 
 selskap:
-  navn: "Fjordheim Holding AS"
-  org_nummer: "912345678"           # 9 siffer uten mellomrom
-  daglig_leder: "Marte Fjordheim"
-  styreleder: "Marte Fjordheim"     # Kan være samme person som daglig leder
-  forretningsadresse: "Storgata 1, 5003 Bergen"
+  navn: "Eksempel Holding AS"
+  org_nummer: "123456789"           # 9 siffer uten mellomrom
+  daglig_leder: "Kari Nordmann"
+  styreleder: "Kari Nordmann"       # Kan være samme person som daglig leder
+  forretningsadresse: "Eksempelgata 1, 0001 Oslo"
   stiftelsesaar: 2021
   aksjekapital: 30000               # NOK — fra stiftelsesdokumentene
 
@@ -119,8 +119,8 @@ skattemelding:
 # Fødselsnummer brukes av Skatteetaten til å forhåndsutfylle aksjonærenes skattemelding.
 
 aksjonaerer:
-  - navn: "Marte Fjordheim"
-    fodselsnummer: "01019012345"        # 11 siffer — personnummer
+  - navn: "Kari Nordmann"
+    fodselsnummer: "01010112345"        # 11 siffer — personnummer
     antall_aksjer: 1000
     aksjeklasse: "ordinære"
     utbytte_utbetalt: 0                 # Utbytte utbetalt til denne aksjonæren i NOK
