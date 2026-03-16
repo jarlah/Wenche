@@ -37,7 +37,7 @@ else:
         "https://platform.altinn.no/authentication/api/v1/exchange/maskinporten"
     )
 
-# Scopes for innsending av instanser
+# Scopes for innsending av instanser via Altinn
 SCOPES = "altinn:instances.read altinn:instances.write"
 
 # Scopes for administrasjon av systemregister og systembruker
@@ -46,6 +46,9 @@ ADMIN_SCOPES = (
     "altinn:authentication/systemuser.request.read "
     "altinn:authentication/systemuser.request.write"
 )
+
+# Scope for innsending av aksjonærregisteroppgave direkte til SKDs API
+SKD_AKSJONAER_SCOPE = "skatteetaten:innrapporteringaksjonaerregisteroppgave"
 TOKEN_FILE = Path.home() / ".wenche" / "token.json"
 
 
@@ -203,6 +206,34 @@ def get_altinn_token() -> str:
         tokens = json.loads(TOKEN_FILE.read_text())
         return tokens["altinn_token"]
     return login()["altinn_token"]
+
+
+def get_skd_aksjonaer_token() -> str:
+    """
+    Henter et Maskinporten-token med SKD aksjonærregister-scope og systembruker.
+
+    SKDs API bruker Maskinporten-token direkte (ingen Altinn-veksling).
+    Krever at scope 'skatteetaten:innrapporteringaksjonaerregisteroppgave'
+    er innvilget av Skatteetaten for klienten.
+    """
+    client_id = _les_påkrevd_env(
+        "MASKINPORTEN_CLIENT_ID",
+        "Kopier .env.example til .env og fyll inn din klient-ID fra Digdirs selvbetjeningsportal.",
+    )
+    kid = _les_påkrevd_env(
+        "MASKINPORTEN_KID",
+        "Finn nøkkel-ID (UUID) i Digdirs selvbetjeningsportal under klientens nøkler og legg den i .env.",
+    )
+    org_nummer = _les_påkrevd_env(
+        "ORG_NUMMER",
+        "Legg til ORG_NUMMER=<ditt organisasjonsnummer> i .env.",
+    )
+    nokkel_sti = os.getenv("MASKINPORTEN_PRIVAT_NOKKEL", "maskinporten_privat.pem")
+    private_key_pem = _les_nokkel(nokkel_sti)
+
+    return _hent_maskinporten_token(
+        client_id, private_key_pem, kid, scopes=SKD_AKSJONAER_SCOPE, org_nummer=org_nummer
+    )
 
 
 def logout():

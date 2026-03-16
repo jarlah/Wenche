@@ -111,8 +111,10 @@ Sammendraget inneholder:
 
 ## Aksjonærregisteroppgave (frist 31. januar)
 
-!!! warning "Midlertidig utilgjengelig"
-    Digital innsending av aksjonærregisteroppgave (RF-1086) via Wenche er for øyeblikket blokkert fordi Skatteetaten ikke har aktivert systembruker-delegering for sin Altinn-app. Koden er ferdig på Wenche sin side, men innsending er ikke mulig før SKD aktiverer støtten. Vi følger saken og oppdaterer dokumentasjonen så snart det er løst.
+Wenche sender RF-1086 direkte til Skatteetatens eget REST-API — ikke via Altinn-instansflyt. Innsendingen er maskinell og krever ikke manuell signering.
+
+!!! note "Forutsetning: tilgang til SKDs API"
+    Innsending krever at Maskinporten-klienten din har fått scopet `skatteetaten:innrapporteringaksjonaerregisteroppgave` innvilget av Skatteetaten. Se [steg 2d i oppsett](oppsett.md#2d-sok-om-tilgang-til-skds-api-for-aksjonaerregisteroppgave) for hvordan du søker om tilgang.
 
 === "Kommandolinje"
 
@@ -122,17 +124,19 @@ Sammendraget inneholder:
     wenche send-aksjonaerregister --dry-run
     ```
 
-    Innsending (krever at SKD har aktivert systembruker-støtte):
+    Send inn:
 
     ```bash
-    wenche login
     wenche send-aksjonaerregister
-    wenche logout
     ```
+
+    Wenche skriver ut forsendelse-ID når innsendingen er fullført.
 
 === "Webgrensesnitt"
 
-    Gå til fanen **Send til Altinn** og klikk **Send aksjonærregisteroppgave**.
+    Gå til fanen **Send til Altinn** og klikk **Send aksjonærregister til Skatteetaten**.
+
+    Forsendelse-ID vises i grensesnittet når innsendingen er fullført.
 
 ---
 

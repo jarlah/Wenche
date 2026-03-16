@@ -23,14 +23,18 @@ _BASES = {
 
 _SYSTEM_NAVN = "wenche"
 
-# Ressurs-IDer for Altinn 3-apper. Format: app_{org}_{appnavn}.
-# Merk: Apper må eksplisitt aktivere systembruker-støtte i Altinn.
-# app_skd_a2-1051-241111 støtter ikke systembruker-delegering ennå (per mars 2026).
-# Inntil SKD aktiverer dette, sender vi kun inn årsregnskap via systembrukerflyten.
+# Ressurser Wenche-systemet trenger tilgang til.
+# BRG årsregnskap: Altinn 3-app, ressurs-ID på format app_{org}_{appnavn}.
+# SKD aksjonærregisteroppgave: SKDs eget REST-API, ressurs-ID fra SKDs API-dokumentasjon.
 _RIGHTS = [
     {
         "resource": [
             {"id": "urn:altinn:resource", "value": "app_brg_aarsregnskap-vanlig-202406"}
+        ]
+    },
+    {
+        "resource": [
+            {"id": "urn:altinn:resource", "value": "ske-innrapportering-aksjonaerregisteroppgave"}
         ]
     },
 ]

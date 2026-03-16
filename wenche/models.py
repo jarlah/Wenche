@@ -21,6 +21,7 @@ class Selskap:
     forretningsadresse: str
     stiftelsesaar: int
     aksjekapital: int
+    kontakt_epost: str = ""     # Påkrevd for aksjonærregisteroppgave (RF-1086)
 
 
 # ---------------------------------------------------------------------------

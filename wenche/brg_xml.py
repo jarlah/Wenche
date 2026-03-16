@@ -30,6 +30,7 @@ def generer_hovedskjema(regnskap: Aarsregnskap) -> bytes:
     signatar = regnskap.signatar or s.daglig_leder
     revideres = "nei" if not regnskap.revideres else "ja"
     ikke_revideres = "ja" if not regnskap.revideres else "nei"
+    morselskap = "ja" if regnskap.balanse.eiendeler.anleggsmidler.aksjer_i_datterselskap > 0 else "nei"
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <melding xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -57,7 +58,7 @@ def generer_hovedskjema(regnskap: Aarsregnskap) -> bytes:
       <regnskapsslutt orid="17104">{aar}-12-31</regnskapsslutt>
     </regnskapsperiode>
     <konsern>
-      <morselskap orid="4168">nei</morselskap>
+      <morselskap orid="4168">{morselskap}</morselskap>
       <konsernregnskap orid="25943">nei</konsernregnskap>
     </konsern>
     <regnskapsprinsipper>

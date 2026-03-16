@@ -16,6 +16,7 @@ import click
 from wenche import __version__
 from wenche import auth, aarsregnskap, aksjonaerregister, skattemelding, systembruker
 from wenche.altinn_client import AltinnClient
+from wenche.skd_client import SkdAksjonaerClient
 
 
 @click.group()
@@ -171,10 +172,11 @@ def send_aarsregnskap(config_fil: str, dry_run: bool):
     "--dry-run",
     is_flag=True,
     default=False,
-    help="Generer og valider XML uten å sende til Altinn.",
+    help="Generer og valider XML lokalt uten å sende til SKD.",
 )
 def send_aksjonaerregister(config_fil: str, dry_run: bool):
-    """Send inn aksjonærregisteroppgave (RF-1086) til Altinn."""
+    """Send inn aksjonærregisteroppgave (RF-1086) til Skatteetaten."""
+    import os
     click.echo(f"Leser konfigurasjon fra {config_fil}...")
     try:
         oppgave = aksjonaerregister.les_config(config_fil)
@@ -196,11 +198,14 @@ def send_aksjonaerregister(config_fil: str, dry_run: bool):
         aksjonaerregister.send_inn(oppgave, klient=None, dry_run=True)
         return
 
-    token = auth.get_altinn_token()
-    with AltinnClient(token) as klient:
-        sign_url = aksjonaerregister.send_inn(oppgave, klient)
-    if sign_url:
-        click.echo(f"\nSigner i Altinn: {sign_url}")
+    click.echo("Henter Maskinporten-token med SKD-scope...")
+    token = auth.get_skd_aksjonaer_token()
+    env = os.getenv("WENCHE_ENV", "prod")
+    with SkdAksjonaerClient(token, env=env) as klient:
+        svar = aksjonaerregister.send_inn(oppgave, klient)
+    if svar:
+        click.echo(f"\nForsendelse-ID: {svar.get('forsendelseId')}")
+        click.echo(f"Dialog-ID:      {svar.get('dialogId')}")
 
 
 # ---------------------------------------------------------------------------

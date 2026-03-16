@@ -13,6 +13,7 @@ selskap:
   forretningsadresse: "Eksempelgata 1, 0001 Oslo"
   stiftelsesaar: 2021
   aksjekapital: 30000               # NOK — fra stiftelsesdokumentene
+  kontakt_epost: "post@eksempel.no" # Påkrevd for aksjonærregisteroppgave (RF-1086)
 
 regnskapsaar: 2024                  # Året regnskapet gjelder for
 

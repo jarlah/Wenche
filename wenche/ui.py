@@ -36,6 +36,7 @@ from wenche import aksjonaerregister as akr_modul
 from wenche import auth, systembruker
 from wenche.altinn_client import AltinnClient
 from wenche.brg_xml import generer_hovedskjema, generer_underskjema
+from wenche.skd_client import SkdAksjonaerClient
 
 # ---------------------------------------------------------------------------
 # Initialisering av session_state fra config.yaml (ved oppstart / refresh)
@@ -51,6 +52,7 @@ _DEFAULTS = {
     "forretningsadresse": "Gateveien 1, 0001 Oslo",
     "stiftelsesaar": 2020,
     "aksjekapital": 30000,
+    "kontakt_epost": "",
     "regnskapsaar": 2025,
     "salgsinntekter": 0,
     "andre_driftsinntekter": 0,
@@ -117,6 +119,7 @@ if "initialisert" not in st.session_state:
             verdier["forretningsadresse"] = s.get("forretningsadresse", verdier["forretningsadresse"])
             verdier["stiftelsesaar"] = int(s.get("stiftelsesaar", verdier["stiftelsesaar"]))
             verdier["aksjekapital"] = int(s.get("aksjekapital", verdier["aksjekapital"]))
+            verdier["kontakt_epost"] = s.get("kontakt_epost", verdier["kontakt_epost"])
             verdier["regnskapsaar"] = int(cfg.get("regnskapsaar", verdier["regnskapsaar"]))
 
             rr = cfg.get("resultatregnskap", {})
@@ -215,6 +218,7 @@ def lagre_config():
             "forretningsadresse": st.session_state["forretningsadresse"],
             "stiftelsesaar": int(st.session_state["stiftelsesaar"]),
             "aksjekapital": int(st.session_state["aksjekapital"]),
+            "kontakt_epost": st.session_state["kontakt_epost"],
         },
         "regnskapsaar": int(st.session_state["regnskapsaar"]),
         "resultatregnskap": {
@@ -621,6 +625,11 @@ with fane_selskap:
         st.text_input("Forretningsadresse", key="forretningsadresse")
         st.number_input("Stiftelsesår", min_value=1900, max_value=2100, key="stiftelsesaar")
         st.number_input("Aksjekapital (NOK)", min_value=0, step=1000, key="aksjekapital")
+        st.text_input(
+            "Kontakt-e-post",
+            key="kontakt_epost",
+            help="Påkrevd for aksjonærregisteroppgave (RF-1086).",
+        )
         st.number_input("Regnskapsår", min_value=2000, max_value=2100, key="regnskapsaar")
 
     st.divider()
@@ -875,6 +884,7 @@ with fane_dokumenter:
                 forretningsadresse=st.session_state["forretningsadresse"],
                 stiftelsesaar=int(st.session_state["stiftelsesaar"]),
                 aksjekapital=int(st.session_state["aksjekapital"]),
+                kontakt_epost=st.session_state.get("kontakt_epost", ""),
             ),
             regnskapsaar=int(st.session_state["regnskapsaar"]),
             resultatregnskap=Resultatregnskap(
@@ -1038,13 +1048,22 @@ with fane_dokumenter:
                 for f in feil:
                     st.error(f)
             else:
-                xml = akr_modul.generer_xml(oppgave)
+                base = f"aksjonaerregister_{int(st.session_state['regnskapsaar'])}_{st.session_state['org_nummer']}"
+                hoved_xml = akr_modul.generer_hovedskjema_xml(oppgave)
                 st.download_button(
-                    "Last ned aksjonaerregister.xml",
-                    data=xml,
-                    file_name=f"aksjonaerregister_{int(st.session_state['regnskapsaar'])}_{st.session_state['org_nummer']}.xml",
+                    "Last ned Hovedskjema (RF-1086)",
+                    data=hoved_xml,
+                    file_name=f"{base}_hovedskjema.xml",
                     mime="application/xml",
                 )
+                for i, aksjonaer in enumerate(oppgave.aksjonaerer, 1):
+                    under_xml = akr_modul.generer_underskjema_xml(aksjonaer, oppgave)
+                    st.download_button(
+                        f"Last ned Underskjema {i} — {aksjonaer.navn}",
+                        data=under_xml,
+                        file_name=f"{base}_underskjema_{i}.xml",
+                        mime="application/xml",
+                    )
 
 # ---------------------------------------------------------------------------
 # Fane 5: Send til Altinn
@@ -1108,7 +1127,7 @@ with fane_send:
                         st.error(f"Innsending feilet:\n\n{e}")
 
     with col2:
-        if st.button("Send aksjonærregister til Altinn", use_container_width=True):
+        if st.button("Send aksjonærregister til Skatteetaten", use_container_width=True):
             regnskap = bygg_regnskap()
             antall = int(st.session_state["antall_aksjonaerer"])
             aksjonaerer = [
@@ -1132,19 +1151,16 @@ with fane_send:
                 for f in feil:
                     st.error(f)
             else:
-                token = hent_token()
-                if token:
-                    try:
-                        with st.spinner("Sender aksjonærregister til Altinn..."):
-                            with AltinnClient(token, env=env) as klient:
-                                sign_url = akr_modul.send_inn(oppgave, klient)
-                        st.success(
-                            f"Aksjonærregisteroppgave for {int(st.session_state['regnskapsaar'])} er lastet opp og klar for signering."
-                        )
-                        st.info(
-                            "Dokumentet venter på din signatur i Altinn. "
-                            "Logg inn med BankID og signer for å fullføre innsendingen."
-                        )
-                        st.link_button("Signer i Altinn", sign_url, type="primary")
-                    except Exception as e:
+                try:
+                    with st.spinner("Henter Maskinporten-token med SKD-scope..."):
+                        skd_token = auth.get_skd_aksjonaer_token()
+                    with st.spinner("Sender aksjonærregisteroppgave til Skatteetaten..."):
+                        with SkdAksjonaerClient(skd_token, env=env) as klient:
+                            svar = akr_modul.send_inn(oppgave, klient)
+                    st.success(
+                        f"Aksjonærregisteroppgave for {int(st.session_state['regnskapsaar'])} er sendt til Skatteetaten."
+                    )
+                    if svar:
+                        st.info(f"Forsendelse-ID: {svar.get('forsendelseId')}")
+                except Exception as e:
                         st.error(f"Innsending feilet:\n\n{e}")

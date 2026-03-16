@@ -64,7 +64,26 @@ Logg inn på riktig portal og følg stegene under:
     | `altinn:authentication/systemuser.request.read` | Sjekke status for systembrukerforespørsel (steg 5) |
     | `altinn:authentication/systemuser.request.write` | Opprette systembrukerforespørsel (steg 5) |
 
+    !!! note "Aksjonærregisteroppgave krever ekstra scope"
+        Innsending av aksjonærregisteroppgave (RF-1086) bruker SKDs eget REST-API og krever scopet `skatteetaten:innrapporteringaksjonaerregisteroppgave`. Dette scopet tildeles av Skatteetaten og er ikke tilgjengelig i Digdirs selvbetjeningsportal — se steg 2d.
+
 5. Kopier **klient-ID** — du trenger den i steg 3
+
+### 2d. Søk om tilgang til SKDs API for aksjonærregisteroppgave
+
+For å sende inn aksjonærregisteroppgave (RF-1086) må Skatteetaten gi klienten din tilgang til scopet `skatteetaten:innrapporteringaksjonaerregisteroppgave`.
+
+1. Gå til [SKDs brukerstøtteportal](https://eksternjira.sits.no/plugins/servlet/desk/site/global) og logg inn
+2. Opprett en ny sak under **Innrapportering → Aksjonærregisteret**
+3. Oppgi følgende i henvendelsen:
+    - At du ønsker tilgang til scopet `skatteetaten:innrapporteringaksjonaerregisteroppgave`
+    - Din Maskinporten klient-ID
+    - Om du ønsker tilgang til testmiljø, produksjon, eller begge
+
+Når SKD har innvilget tilgangen vil scopet bli synlig på klienten din i Digdirs selvbetjeningsportal.
+
+!!! info "Behandlingstid"
+    SKD behandler vanligvis slike forespørsler innen noen virkedager.
 
 ### 2c. Last opp offentlig nøkkel
 
