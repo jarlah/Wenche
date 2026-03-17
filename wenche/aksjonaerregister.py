@@ -56,14 +56,20 @@ def les_config(config_fil: str) -> Aksjonaerregisteroppgave:
     )
 
 
-def generer_hovedskjema_xml(oppgave: Aksjonaerregisteroppgave) -> bytes:
+def generer_hovedskjema_xml(
+    oppgave: Aksjonaerregisteroppgave, innsending_org: str = ""
+) -> bytes:
     """
     Genererer RF-1086 Hovedskjema XML for SKDs API.
 
     Inneholder selskapsopplysninger, aksjekapital og utstedelse ved stiftelse.
     Valideres mot: aksjonaerregisteroppgaveHovedskjema.xsd
+
+    innsending_org overstyrer org.nr. i XML (brukes i SKDs testmiljø der syntetisk
+    org fra Tenor er påkrevd — sett SKD_TEST_ORG_NUMMER i .env).
     """
     s = oppgave.selskap
+    org = innsending_org or s.org_nummer
     aar = oppgave.regnskapsaar
     totalt_aksjer = oppgave.totalt_antall_aksjer
     paalydende = s.aksjekapital // totalt_aksjer if totalt_aksjer > 0 else 0
@@ -74,7 +80,7 @@ def generer_hovedskjema_xml(oppgave: Aksjonaerregisteroppgave) -> bytes:
         blankettnummer="RF-1086" gruppeid="2586" etatid="974761076">
     <GenerellInformasjon-grp-2587 gruppeid="2587">
         <Selskap-grp-2588 gruppeid="2588">
-            <EnhetOrganisasjonsnummer-datadef-18 orid="18">{escape(s.org_nummer)}</EnhetOrganisasjonsnummer-datadef-18>
+            <EnhetOrganisasjonsnummer-datadef-18 orid="18">{escape(org)}</EnhetOrganisasjonsnummer-datadef-18>
             <EnhetNavn-datadef-1 orid="1">{escape(s.navn)}</EnhetNavn-datadef-1>
             <EnhetAdresse-datadef-15 orid="15">{escape(s.forretningsadresse)}</EnhetAdresse-datadef-15>
             <AksjeType-datadef-17659 orid="17659">01</AksjeType-datadef-17659>
@@ -146,7 +152,7 @@ def generer_hovedskjema_xml(oppgave: Aksjonaerregisteroppgave) -> bytes:
 
 
 def generer_underskjema_xml(
-    aksjonaer: Aksjonaer, oppgave: Aksjonaerregisteroppgave
+    aksjonaer: Aksjonaer, oppgave: Aksjonaerregisteroppgave, innsending_org: str = ""
 ) -> bytes:
     """
     Genererer RF-1086-U Underskjema XML for én aksjonær.
@@ -155,6 +161,7 @@ def generer_underskjema_xml(
     Valideres mot: aksjonaerregisteroppgaveUnderskjema.xsd
     """
     s = oppgave.selskap
+    org = innsending_org or s.org_nummer
     aar = oppgave.regnskapsaar
     anskaffelsesverdi = aksjonaer.innbetalt_kapital_per_aksje * aksjonaer.antall_aksjer
     stiftelsesdato = f"{s.stiftelsesaar}-01-01T00:00:00"
@@ -165,7 +172,7 @@ def generer_underskjema_xml(
         gruppeid="3983" etatid="974761076">
     <SelskapsOgAksjonaropplysninger-grp-3987 gruppeid="3987">
         <Selskapsidentifikasjon-grp-3986 gruppeid="3986">
-            <EnhetOrganisasjonsnummer-datadef-18 orid="18">{escape(s.org_nummer)}</EnhetOrganisasjonsnummer-datadef-18>
+            <EnhetOrganisasjonsnummer-datadef-18 orid="18">{escape(org)}</EnhetOrganisasjonsnummer-datadef-18>
             <AksjeType-datadef-17659 orid="17659">01</AksjeType-datadef-17659>
             <Inntektsar-datadef-692 orid="692">{aar}</Inntektsar-datadef-692>
         </Selskapsidentifikasjon-grp-3986>
@@ -261,10 +268,15 @@ def send_inn(
 
     print("Validering OK.")
 
-    hoved_xml = generer_hovedskjema_xml(oppgave)
+    env = os.getenv("WENCHE_ENV", "prod")
+    innsending_org = os.getenv("SKD_TEST_ORG_NUMMER", "") if env == "test" else ""
+    if innsending_org:
+        print(f"Testmodus: bruker syntetisk org.nr. {innsending_org} i XML (SKD_TEST_ORG_NUMMER).")
+
+    hoved_xml = generer_hovedskjema_xml(oppgave, innsending_org)
     print(f"RF-1086 Hovedskjema generert ({len(hoved_xml):,} bytes).")
 
-    under_xmler = [generer_underskjema_xml(a, oppgave) for a in oppgave.aksjonaerer]
+    under_xmler = [generer_underskjema_xml(a, oppgave, innsending_org) for a in oppgave.aksjonaerer]
     print(f"RF-1086-U Underskjema generert ({len(under_xmler)} stk).")
 
     if dry_run:

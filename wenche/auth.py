@@ -224,10 +224,13 @@ def get_skd_aksjonaer_token() -> str:
         "MASKINPORTEN_KID",
         "Finn nøkkel-ID (UUID) i Digdirs selvbetjeningsportal under klientens nøkler og legg den i .env.",
     )
-    org_nummer = _les_påkrevd_env(
+    vendor_orgnr = _les_påkrevd_env(
         "ORG_NUMMER",
         "Legg til ORG_NUMMER=<ditt organisasjonsnummer> i .env.",
     )
+    # I SKDs testmiljø må systembrukeren tilhøre et syntetisk Tenor-org, ikke produksjonsorg.
+    env = os.getenv("WENCHE_ENV", "prod")
+    org_nummer = os.getenv("SKD_TEST_ORG_NUMMER", vendor_orgnr) if env == "test" else vendor_orgnr
     nokkel_sti = os.getenv("MASKINPORTEN_PRIVAT_NOKKEL", "maskinporten_privat.pem")
     private_key_pem = _les_nokkel(nokkel_sti)
 

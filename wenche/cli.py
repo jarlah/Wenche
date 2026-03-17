@@ -89,19 +89,26 @@ def registrer_system():
 
 
 @main.command("opprett-systembruker")
-def opprett_systembruker():
+@click.option(
+    "--org",
+    default=None,
+    help="Org.nr. for systembrukeren. Standard: ORG_NUMMER fra .env. "
+         "I SKDs testmiljø skal dette være et syntetisk org.nr. fra Tenor.",
+)
+def opprett_systembruker(org: str | None):
     """Opprett systembrukerforespørsel og få godkjenningslenke."""
     import os
-    org_nummer = os.getenv("ORG_NUMMER")
-    if not org_nummer:
+    vendor_orgnr = os.getenv("ORG_NUMMER")
+    if not vendor_orgnr:
         click.echo("Feil: ORG_NUMMER må være satt i .env.", err=True)
         raise SystemExit(1)
+    org_nummer = org or vendor_orgnr
 
     click.echo("Henter Maskinporten admin-token...")
     token = auth.login_admin()
     click.echo(f"Oppretter systembrukerforespørsel for {org_nummer}...")
     try:
-        svar = systembruker.opprett_forespørsel(token, org_nummer, org_nummer)
+        svar = systembruker.opprett_forespørsel(token, vendor_orgnr, org_nummer)
         click.echo(f"\nForespørsel opprettet (ID: {svar['id']})")
         click.echo(f"Status: {svar['status']}")
         click.echo(f"\nGodkjenn her:\n  {svar['confirmUrl']}")
